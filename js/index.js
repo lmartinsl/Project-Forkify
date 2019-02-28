@@ -109,11 +109,11 @@ class Search {
 };
 
 /* 
-    Global State of the app 
-    - Search Object
-    - Current recipe Object
-    - Shopping list object
-    - Liked Recipes
+Global State of the app 
+- Search Object
+- Current recipe Object
+- Shopping list object
+- Liked Recipes
 */
 const state = {};
 
