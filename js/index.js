@@ -339,7 +339,9 @@ if (typeof module !== "undefined")
     module.exports.Fraction = Fraction
 
 // KEY and PROXYs
-const key = 'abada4a41d09645f246271968ff65c37';
+// const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
+const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
+
 // const proxy = 'http://crossorigin.me/';
 // const proxy = 'https://cors-anywhere.herokuapp.com/';
 
@@ -393,7 +395,7 @@ const highlightSelected = id => {
         el.classList.remove('results__link--active');
     });
 
-    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active'); // destaca o item selecionado de acordo com o id recebido
+    document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active'); // destaca o item selecionado de acordo com o id recebido
 };
 
 const limitRecipeTitle = (title, limit = 17) => { // Reduz o tamanho do título de acordo com o UI
@@ -409,7 +411,7 @@ const limitRecipeTitle = (title, limit = 17) => { // Reduz o tamanho do título 
     if (title.length > limit) {
         title.split(' ').reduce((acc, cur) => {
             // console.log(`Acumulador: ${acc} Elemento Atual: ${cur}`);
-            if (acc + cur.length <= 17) {
+            if (acc + cur.length <= limit) {
                 newTitle.push(cur);
             }
             return acc + cur.length;
@@ -486,10 +488,7 @@ const renderResults = (recipes, page = 1, resPerPage = 10) => {
 };
 
 // RECIPE VIEW
-const clearRecipe = () => {
-
-    elements.recipe.innerHTML = '';
-};
+const clearRecipe = () => { elements.recipe.innerHTML = '' };
 
 const formatCount = count => {
 
@@ -510,7 +509,7 @@ const formatCount = count => {
         }
     }
     return '?';
-}
+};
 
 const createIngredient = ingredient => `
     <li class="recipe__item">
@@ -551,16 +550,19 @@ const renderRecipe2 = recipe => {
                 <span class="recipe__info-text"> servings</span>
 
                 <div class="recipe__info-buttons">
-                    <button class="btn-tiny">
+
+                    <button class="btn-tiny btn-decrease">
                         <svg>
                             <use href="img/icons.svg#icon-circle-with-minus"></use>
                         </svg>
                     </button>
-                    <button class="btn-tiny">
+
+                    <button class="btn-tiny btn-increase">
                         <svg>
                             <use href="img/icons.svg#icon-circle-with-plus"></use>
                         </svg>
                     </button>
+
                 </div>
 
             </div>
@@ -600,6 +602,17 @@ const renderRecipe2 = recipe => {
         </div>
     `;
     elements.recipe.insertAdjacentHTML('afterbegin', markup);
+};
+
+const updateServingsIngredients = recipe => {
+    // Update servings
+    document.querySelector('.recipe__info-data--people').textContent = recipe.servings;
+
+    // Update ingredeints
+    const countElements = Array.from(document.querySelectorAll('.recipe__count'));
+    countElements.forEach((el, i) => {
+        el.textContent = formatCount(recipe.ingredients[i].count);
+    });
 };
 
 // RECIPE
@@ -698,6 +711,18 @@ class Recipe {
         });
         this.ingredients = newIngredients;
     };
+
+    updateServings (type) { // Atualiza as porções e ambos os ingredientes
+        // Servings
+        const newServings = type === 'dec' ? this.servings - 1 : this.servings + 1;
+
+        // Ingredients
+        this.ingredients.forEach(ing => {
+            ing.count *= (newServings / this.servings);
+        });
+
+        this.servings = newServings;
+    };
 };
 
 // SEARCH
@@ -719,6 +744,44 @@ class Search {
         } catch(error) {
             alert(`Ops! ${error}`);
         }
+    }
+};
+
+// LIST
+uniqid = () => { // gera um conjunto de caracteres alfanuméricos aleatórios
+    let ts=String(new Date().getTime()), i = 0, out = '';
+    for(i=0;i<ts.length;i+=2) {        
+       out+=Number(ts.substr(i, 2)).toString(36);    
+    }
+    return ('d'+out);
+};
+
+class List {
+
+    constructor() {
+        this.items = [];
+    }
+
+    addItem (count, unit, ingredient) {
+        const item = {
+            id: uniqid(),
+            count,
+            unit,
+            ingredient
+        }
+        this.items.push(item);
+        return item
+    }
+
+    deleteItem (id) {
+        const index = this.items.findIndex(el => el.id === id);
+        // [2,4,8] splice(1,1) -> returns 4, original array is [2,8]
+        // [2,4,8] slice(1,1) -> returns 4, original array is [2,4,8] - Não altera a Array original
+        this.items.splice(index, 1);
+    }
+
+    updateCount(id, newCount) {
+        this.items.find(el => el.id === id).count = newCount;
     }
 };
 
@@ -803,7 +866,7 @@ controlRecipe = async () => {
     
             // Render recipe
             clearLoader();
-            console.log(state.recipe); // teste
+            // console.log(state.recipe); // teste
             renderRecipe2(state.recipe);
         } catch (error) {
             alert('Error processing recipe!');
@@ -816,6 +879,25 @@ window.addEventListener('hashchange', controlRecipe); // retorna a hash pra cada
 
 // Adicionando o mesmo eventListener para diferentes eventos.
 // ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe)); // HABILITAR DEPOIS
+
+// Handling recipe button clicks
+elements.recipe.addEventListener('click', e => {
+    // O método Element.matches() retorna verdadeiro se o elemento puder ser selecionado pela sequência de caracteres específica; caso contrário retorna falso.
+    if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+        // Decrease button is clicked
+        if (state.recipe.servings > 1) {
+            state.recipe.updateServings('dec');
+            updateServingsIngredients(state.recipe);
+        }
+    } else if (e.target.matches('.btn-increase, .btn-increase *')) {
+        // Increase button is clicked
+        state.recipe.updateServings('inc');
+        updateServingsIngredients(state.recipe)
+    };
+    // console.log(state.recipe); // testing
+});
+
+window.l = new List();
 
 
 
