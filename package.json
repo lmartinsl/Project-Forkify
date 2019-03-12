@@ -1,0 +1,25 @@
+{
+  "name": "forkify",
+  "version": "1.0.0",
+  "description": "forkify project",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "fractional": "^1.0.0",
+    "package-json": "^6.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmartinsl/Forkify.git"
+  },
+  "author": "Lucas Martins Lima",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lmartinsl/Forkify/issues"
+  },
+  "homepage": "https://github.com/lmartinsl/Forkify#readme"
+} 
