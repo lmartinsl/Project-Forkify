@@ -339,8 +339,8 @@ if (typeof module !== "undefined")
     module.exports.Fraction = Fraction
 
 // KEY and PROXYs
-// const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
-const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
+const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
+// const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
 
 // const proxy = 'http://crossorigin.me/';
 // const proxy = 'https://cors-anywhere.herokuapp.com/';
@@ -783,13 +783,13 @@ class Likes {
 
     addLike(id, title, author, img) {
         const like = { id, title, author, img };
-        this.likes.push(like); // empurra as informações de like para likes
+        this.likes.push(like);
         return like;
     }
 
     deleteLike(id) {
         const index = this.likes.findIndex(el => el.id === id);
-        this.items.splice(index, 1);
+        this.likes.splice(index, 1);
     }
 
     isLiked(id) {
@@ -970,8 +970,44 @@ elements.shopping.addEventListener('click', e => {
     };
 });
 
+/**
+ * LIKE CONTROLLER
+ */
+const controlLike = () => {
+
+    if(!state.likes) state.likes = new Likes();
+    const currentID = state.recipe.id
+
+    // User has NOT yet liked current recipe
+    if (!state.likes.isLiked(currentID)) {
+        // Add like to the state
+        const newLike = state.likes.addLike(
+            currentID,
+            state.recipe.title,
+            state.recipe.author,
+            state.recipe.img
+        );
+
+        // Toggle the like button
+
+        // Add like to UI list
+        console.log(state.likes);
+        
+        // User HAS yet liked current recipe    
+    } else {
+        // Remove like from the state
+        state.likes.deleteLike(currentID);
+
+        // Toggle the like button
+        
+        // Remove like from UI list
+        console.log(state.likes);
+    };
+};
+
 // Handling recipe button clicks
 elements.recipe.addEventListener('click', e => {
+
     // O método Element.matches() retorna verdadeiro se o elemento puder ser selecionado pela sequência de caracteres específica; caso contrário retorna falso.
     if (e.target.matches('.btn-decrease, .btn-decrease *')) {
         // Decrease button is clicked
@@ -985,7 +1021,11 @@ elements.recipe.addEventListener('click', e => {
         updateServingsIngredients(state.recipe)
         //                      Seletor de CSS para todos os elementos filhos do elemento .recipe__btn
     } else if (e.target.matches('.recipe__btn--add, recipe__btn--add *')) {
+        // Add ingredients to shopping list
         controlList();
+    } else if (e.target.matches('.recipe__love, recipe__love *')) {
+        // Like Controller
+        controlLike();
     };
     // console.log(state.recipe); // testing
 });
