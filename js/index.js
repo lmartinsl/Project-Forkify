@@ -339,8 +339,9 @@ if (typeof module !== "undefined")
     module.exports.Fraction = Fraction
 
 // KEY and PROXYs
-const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
+// const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
 // const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
+const key = '90a8bd8d02da94168288289c5e5c0ed4'; // larissa.charlynni1@hotmail.com
 
 // const proxy = 'http://crossorigin.me/';
 // const proxy = 'https://cors-anywhere.herokuapp.com/';
@@ -354,7 +355,9 @@ const elements = {
     searchResList: document.querySelector('.results__list'),
     searchResPages: document.querySelector('.results__pages'),
     recipe: document.querySelector('.recipe'),
-    shopping: document.querySelector('.shopping__list')
+    shopping: document.querySelector('.shopping__list'),
+    likesMenu: document.querySelector('.likes__field'),
+    likesList: document.querySelector('.likes__list')
 };
 
 const elementStrings = {
@@ -510,9 +513,42 @@ const renderItem = item => {
 
 deleteItem = id => {
 
-    const item = document.querySelector(`[data-itemid="${id}"]`);
+    const item = document.querySelector(`[data-itemid="${id}"]  `);
     if (item) item.parentElement.removeChild(item);
 };
+
+// LIKES VIEW
+const toggleLikeBtn = isLiked => {
+    const iconString = isLiked ? 'icon-heart' : 'icon-heart-outlined';
+    document.querySelector('.recipe__love use').setAttribute('href', `img/icons.svg#${iconString}`);
+    // icons.svg#icon-heart-outlined
+};
+
+const toggleLikeMenu = numLikes => {
+    elements.likesMenu.style.visibility = numLikes > 0 ? 'visible' : 'hidden';
+};
+
+const renderLike = like => {
+    const markup = `
+        <li>
+            <a class="likes__link" href="#${like.id}">
+                <figure class="likes__fig">
+                    <img src="${like.img}" alt="${like.title}">
+                </figure>
+                <div class="likes__data">
+                    <h4 class="likes__name">${limitRecipeTitle(like.title)}</h4>
+                    <p class="likes__author">${like.author}</p>
+                </div>
+            </a>
+        </li>
+    `;
+    elements.likesList.insertAdjacentHTML('beforeend', markup);
+};
+
+const deleteLike = id => {
+    const el = document.querySelector('.likes__link[href*="${id}"]').parentElement;
+    if (el) el.parentElement.removeChild(el);
+}
 
 // RECIPE VIEW
 const clearRecipe = () => { elements.recipe.innerHTML = '' };
@@ -551,7 +587,7 @@ const createIngredient = ingredient => `
     </li>
 `;
 
-const renderRecipe2 = recipe => {
+const renderRecipe2 = (recipe, isLiked) => {
 
     const markup = `
         <figure class="recipe__fig">
@@ -595,7 +631,7 @@ const renderRecipe2 = recipe => {
             </div>
             <button class="recipe__love">
                 <svg class="header__likes">
-                    <use href="img/icons.svg#icon-heart-outlined"></use>
+                    <use href="img/icons.svg#icon-heart${isLiked ? '' : '-outlined'}"></use>
                 </svg>
             </button>
         </div>
@@ -922,7 +958,10 @@ controlRecipe = async () => {
             // Render recipe
             clearLoader();
             // console.log(state.recipe); // teste
-            renderRecipe2(state.recipe);
+            renderRecipe2(
+                state.recipe,
+                state.likes.isLiked(id)
+            );
         } catch (error) {
             alert('Error processing recipe!');
         }
@@ -973,6 +1012,11 @@ elements.shopping.addEventListener('click', e => {
 /**
  * LIKE CONTROLLER
  */
+
+// TESTING
+state.likes = new Likes();
+toggleLikeMenu(state.likes.getNumLikes());
+
 const controlLike = () => {
 
     if(!state.likes) state.likes = new Likes();
@@ -989,20 +1033,23 @@ const controlLike = () => {
         );
 
         // Toggle the like button
-
+        toggleLikeBtn(true);
+        
         // Add like to UI list
-        console.log(state.likes);
+        renderLike(newLike);
         
         // User HAS yet liked current recipe    
     } else {
         // Remove like from the state
         state.likes.deleteLike(currentID);
-
+        
         // Toggle the like button
+        toggleLikeBtn(false);
         
         // Remove like from UI list
-        console.log(state.likes);
+        deleteLike(currentID);
     };
+    toggleLikeMenu(state.likes.getNumLikes());
 };
 
 // Handling recipe button clicks
