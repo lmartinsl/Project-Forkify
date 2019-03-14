@@ -398,7 +398,6 @@ const highlightSelected = id => {
     resultsArr.forEach(el => { // remove a classe assim que outro elemento é ativado
         el.classList.remove('results__link--active');
     });
-
     document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active'); // destaca o item selecionado de acordo com o id recebido
 };
 
@@ -546,7 +545,7 @@ const renderLike = like => {
 };
 
 const deleteLike = id => {
-    const el = document.querySelector('.likes__link[href*="${id}"]').parentElement;
+    const el = document.querySelector(`.likes__link[href*="${id}"]`).parentElement;
     if (el) el.parentElement.removeChild(el);
 }
 
