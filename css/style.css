@@ -451,7 +451,7 @@ body {
     border-bottom: 1px solid #F2EFEE;
     position: relative; }
   .shopping__count {
-    flex: 0 0 7.5rem;
+    flex: 0 0 9em;
     padding: .4rem .5rem;
     border: 1px solid #F2EFEE;
     border-radius: 3px;
@@ -465,7 +465,7 @@ body {
       font-size: 1.2rem;
       text-align: center;
       border: none;
-      width: 3.7rem;
+      width: 5rem;
       border-radius: 3px; }
       .shopping__count input:focus {
         outline: none;

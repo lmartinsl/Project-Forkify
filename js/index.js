@@ -353,7 +353,8 @@ const elements = {
     SearchRes: document.querySelector('.results'),
     searchResList: document.querySelector('.results__list'),
     searchResPages: document.querySelector('.results__pages'),
-    recipe: document.querySelector('.recipe')
+    recipe: document.querySelector('.recipe'),
+    shopping: document.querySelector('.shopping__list')
 };
 
 const elementStrings = {
@@ -487,6 +488,32 @@ const renderResults = (recipes, page = 1, resPerPage = 10) => {
     renderButtons(page, recipes.recipes.length, resPerPage);
 };
 
+// LIST VIEW
+const renderItem = item => {
+
+    const markup = `
+        <li class="shopping__item" data-itemid=${item.id}>
+            <div class="shopping__count">
+                <input type="number" value="${item.count}" step="${item.count}" class="shopping__count-value">
+                <p>${item.unit}</p>
+            </div>
+            <p class="shopping__description">${item.ingredient}</p>
+            <button class="shopping__delete btn-tiny">
+                <svg>
+                    <use href="img/icons.svg#icon-circle-with-cross"></use>
+                </svg>
+            </button>
+        </li>
+    `;
+    elements.shopping.insertAdjacentHTML('beforeend', markup);
+};
+
+deleteItem = id => {
+
+    const item = document.querySelector(`[data-itemid="${id}"]`);
+    if (item) item.parentElement.removeChild(item);
+};
+
 // RECIPE VIEW
 const clearRecipe = () => { elements.recipe.innerHTML = '' };
 
@@ -578,7 +605,7 @@ const renderRecipe2 = recipe => {
                 ${recipe.ingredients.map(el => createIngredient(el)).join('')}
             </ul>
 
-            <button class="btn-small recipe__btn">
+            <button class="btn-small recipe__btn recipe__btn--add">
                 <svg class="search__icon">
                     <use href="img/icons.svg#icon-shopping-cart"></use>
                 </svg>
@@ -747,6 +774,33 @@ class Search {
     }
 };
 
+// LIKES
+class Likes {
+    
+    constructor() {
+        this.likes = [];
+    }
+
+    addLike(id, title, author, img) {
+        const like = { id, title, author, img };
+        this.likes.push(like); // empurra as informações de like para likes
+        return like;
+    }
+
+    deleteLike(id) {
+        const index = this.likes.findIndex(el => el.id === id);
+        this.items.splice(index, 1);
+    }
+
+    isLiked(id) {
+        return this.likes.findIndex(el => el.id === id) !== -1;
+    }
+
+    getNumLikes() {
+        return this.likes.length;
+    }
+}
+
 // LIST
 uniqid = () => { // gera um conjunto de caracteres alfanuméricos aleatórios
     let ts=String(new Date().getTime()), i = 0, out = '';
@@ -793,6 +847,7 @@ Global State of the app
 - Liked Recipes
 */
 const state = {};
+window.state = state;
 
 /* SEARCH CONTROLLER */
 const controlSearch = async() => { // Controle de Pesquisa
@@ -880,6 +935,41 @@ window.addEventListener('hashchange', controlRecipe); // retorna a hash pra cada
 // Adicionando o mesmo eventListener para diferentes eventos.
 // ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe)); // HABILITAR DEPOIS
 
+/**
+ * LIST CONTROLLER
+ */
+const controlList = () => {
+
+    // Create a new list IF there in none yet
+    if (!state.list) state.list = new List();
+
+    // Add each ingredient to the list and UI
+    state.recipe.ingredients.forEach(el => {
+        const item = state.list.addItem(el.count, el.unit, el.ingredient);
+        renderItem(item);
+    })
+};
+
+// Handle delete and update list item events
+elements.shopping.addEventListener('click', e => {
+
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+    //Handle the delete button
+    if(e.target.matches('.shopping__delete, .shopping__delete *')) { // exclui as compras ou qualquer elemento filho dele 
+        // Delete from state
+        state.list.deleteItem(id);
+
+        // Delete from UI
+        deleteItem(id);
+
+    // handle the count update
+    } else if (e.target.matches('.shopping__count-value')) {
+        const newValue = parseFloat(e.target.value, 10); // regata o valor atual do item clicado
+        state.list.updateCount(id, newValue);
+    };
+});
+
 // Handling recipe button clicks
 elements.recipe.addEventListener('click', e => {
     // O método Element.matches() retorna verdadeiro se o elemento puder ser selecionado pela sequência de caracteres específica; caso contrário retorna falso.
@@ -893,6 +983,9 @@ elements.recipe.addEventListener('click', e => {
         // Increase button is clicked
         state.recipe.updateServings('inc');
         updateServingsIngredients(state.recipe)
+        //                      Seletor de CSS para todos os elementos filhos do elemento .recipe__btn
+    } else if (e.target.matches('.recipe__btn--add, recipe__btn--add *')) {
+        controlList();
     };
     // console.log(state.recipe); // testing
 });
