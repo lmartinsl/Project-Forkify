@@ -339,9 +339,9 @@ if (typeof module !== "undefined")
     module.exports.Fraction = Fraction
 
 // KEY and PROXYs
-// const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
+const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
 // const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
-const key = '90a8bd8d02da94168288289c5e5c0ed4'; // larissa.charlynni1@hotmail.com
+// const key = '90a8bd8d02da94168288289c5e5c0ed4'; // larissa.charlynni1@hotmail.com
 
 // const proxy = 'http://crossorigin.me/';
 // const proxy = 'https://cors-anywhere.herokuapp.com/';
@@ -819,24 +819,47 @@ class Likes {
     addLike(id, title, author, img) {
         const like = { id, title, author, img };
         this.likes.push(like);
+        
+        // Persist data in localStorage
+        this.persistData();
+        
         return like;
     }
-
+    
     deleteLike(id) {
         const index = this.likes.findIndex(el => el.id === id);
         this.likes.splice(index, 1);
+        
+        // Persist data in localStorage
+        this.persistData();
     }
-
+    
     isLiked(id) {
         return this.likes.findIndex(el => el.id === id) !== -1;
+        
     }
 
     getNumLikes() {
         return this.likes.length;
     }
+
+    persistData() {
+        //                    ID      valor que poderá ser somente uma string
+        localStorage.setItem('likes', JSON.stringify(this.likes)) // transforma em uma String
+    }
+
+    readStorage() {
+        // Como o retorno do localStorage retorna uma string, precisamos convertê-lo novamente para JS
+        // Quanto não existir a chave que estamos procurando, retorna-se null
+        const storage = JSON.parse(localStorage.getItem('likes'));
+        
+        // Restaura os likes do armazenamento local
+        if (storage) this.likes = storage;
+    }
 }
 
 // LIST
+// UNIQ ID GENERATOR
 uniqid = () => { // gera um conjunto de caracteres alfanuméricos aleatórios
     let ts=String(new Date().getTime()), i = 0, out = '';
     for(i=0;i<ts.length;i+=2) {        
@@ -1011,11 +1034,6 @@ elements.shopping.addEventListener('click', e => {
 /**
  * LIKE CONTROLLER
  */
-
-// TESTING
-state.likes = new Likes();
-toggleLikeMenu(state.likes.getNumLikes());
-
 const controlLike = () => {
 
     if(!state.likes) state.likes = new Likes();
@@ -1050,6 +1068,15 @@ const controlLike = () => {
     };
     toggleLikeMenu(state.likes.getNumLikes());
 };
+
+// Restore liked recipes on page load
+window.addEventListener('load', () => {
+
+    state.likes = new Likes(); // cria uma instância vazia de Likes
+    state.likes.readStorage(); // retorna os likes
+    toggleLikeMenu(state.likes.getNumLikes()); // alterna/atualiza o like na UI
+    state.likes.likes.forEach(like => renderLike(like)); // Renderiza os likes existentes
+});
 
 // Handling recipe button clicks
 elements.recipe.addEventListener('click', e => {
