@@ -858,16 +858,16 @@ class Likes {
     }
 }
 
-// LIST
 // UNIQ ID GENERATOR
 uniqid = () => { // gera um conjunto de caracteres alfanuméricos aleatórios
     let ts=String(new Date().getTime()), i = 0, out = '';
     for(i=0;i<ts.length;i+=2) {        
-       out+=Number(ts.substr(i, 2)).toString(36);    
+        out+=Number(ts.substr(i, 2)).toString(36);    
     }
     return ('d'+out);
 };
 
+// LIST
 class List {
 
     constructor() {
@@ -905,9 +905,10 @@ Global State of the app
 - Liked Recipes
 */
 const state = {};
-window.state = state;
 
-/* SEARCH CONTROLLER */
+/**
+ * SEARCH CONTROLLER
+ */
 const controlSearch = async() => { // Controle de Pesquisa
 
     // 1) Get the query from the view
@@ -950,13 +951,13 @@ elements.searchResPages.addEventListener('click', event => {
     }
 });
 
-/* RECIPE CONTROLLER */
+/**
+ * RECIPE CONTROLLER
+ */
 controlRecipe = async () => {
     // Get ID from url
     const id = window.location.hash.replace('#', ''); // Retorna URL inteira ou (.hash), que retornará somente a hash
                                                       // Replace substitui a # por uma string vazia -> ''
-    console.log(id);
-
     if (id) {
         // Prepare UI for changes
         clearRecipe();
@@ -990,11 +991,11 @@ controlRecipe = async () => {
     }
 };
 
-window.addEventListener('hashchange', controlRecipe); // retorna a hash pra cada alteração de chamada
+// window.addEventListener('hashchange', controlRecipe); // retorna a hash pra cada alteração de chamada
 // window.addEventListener('load', controlRecipe);
 
 // Adicionando o mesmo eventListener para diferentes eventos.
-// ['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe)); // HABILITAR DEPOIS
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe)); // HABILITAR DEPOIS
 
 /**
  * LIST CONTROLLER
@@ -1100,10 +1101,7 @@ elements.recipe.addEventListener('click', e => {
         // Like Controller
         controlLike();
     };
-    // console.log(state.recipe); // testing
 });
-
-window.l = new List();
 
 
 
