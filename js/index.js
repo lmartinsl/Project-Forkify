@@ -339,8 +339,8 @@ if (typeof module !== "undefined")
     module.exports.Fraction = Fraction
 
 // KEY and PROXYs
-const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
-// const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
+// const key = 'abada4a41d09645f246271968ff65c37'; // martiins_94@hotmail.com
+const key = '45e775870cf44fe08c33a86689b1fbea'; // lucasmartiinslima@gmail.com
 // const key = '90a8bd8d02da94168288289c5e5c0ed4'; // larissa.charlynni1@hotmail.com
 
 // const proxy = 'http://crossorigin.me/';
@@ -398,7 +398,9 @@ const highlightSelected = id => {
     resultsArr.forEach(el => { // remove a classe assim que outro elemento é ativado
         el.classList.remove('results__link--active');
     });
-    document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active'); // destaca o item selecionado de acordo com o id recebido
+    if (document.querySelector(`.results__link[href*="${id}"]`)) {
+        document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active'); // destaca o item selecionado de acordo com o id recebido
+    }
 };
 
 const limitRecipeTitle = (title, limit = 17) => { // Reduz o tamanho do título de acordo com o UI
