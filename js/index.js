@@ -357,7 +357,8 @@ const elements = {
     recipe: document.querySelector('.recipe'),
     shopping: document.querySelector('.shopping__list'),
     likesMenu: document.querySelector('.likes__field'),
-    likesList: document.querySelector('.likes__list')
+    likesList: document.querySelector('.likes__list'),
+    logoInit: document.querySelector('.header__logo')
 };
 
 const elementStrings = {
@@ -678,6 +679,12 @@ const updateServingsIngredients = recipe => {
         el.textContent = formatCount(recipe.ingredients[i].count);
     });
 };
+
+elements.logoInit.addEventListener('click', () => {
+    clearInputs(); // limpa o input de pesquisa
+    clearResults(); // limpa a lista de resultados 
+    controlRecipe();
+});
 
 // RECIPE
 class Recipe {
