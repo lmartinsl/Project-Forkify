@@ -164,7 +164,8 @@ body {
   .header__logo {
     margin-left: 4rem;
     height: 4.5rem;
-    display: block; }
+    display: block;
+    cursor: pointer; }
 
 .search {
   background-color: #fff;
